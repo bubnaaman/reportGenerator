@@ -1,10 +1,37 @@
 package com.example.reportgenerator.model;
 
 import lombok.Data;
-import java.math.BigDecimal;
 
 @Data
 public class InputRecord {
+
+    private String field1;
+
+    private String field2;
+
+    private String field3;
+
+    private Double field5;
+
+    private String refkey1;
+
+    private String refkey2;
+
+    public InputRecord(String field1, String field2, String field3,
+                       Double field5, String refkey1, String refkey2) {
+        this.field1 = field1;
+        this.field2 = field2;
+        this.field3 = field3;
+        this.field5 = field5;
+        this.refkey1 = refkey1;
+        this.refkey2 = refkey2;
+    }
+
+    public InputRecord()
+    {
+
+    }
+
     public String getField1() {
         return field1;
     }
@@ -53,10 +80,15 @@ public class InputRecord {
         this.refkey2 = refkey2;
     }
 
-    private String field1;
-    private String field2;
-    private String field3;
-    private Double field5;
-    private String refkey1;
-    private String refkey2;
+    @Override
+    public String toString() {
+        return "InputRecord{" +
+                "field1='" + field1 + '\'' +
+                ", field2='" + field2 + '\'' +
+                ", field3='" + field3 + '\'' +
+                ", field5=" + field5 +
+                ", refkey1='" + refkey1 + '\'' +
+                ", refkey2='" + refkey2 + '\'' +
+                '}';
+    }
 }

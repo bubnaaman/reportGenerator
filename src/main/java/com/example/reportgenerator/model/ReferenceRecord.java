@@ -1,12 +1,37 @@
 package com.example.reportgenerator.model;
 
 import lombok.Data;
-import java.math.BigDecimal;
 
 @Data
 public class ReferenceRecord {
+
     private String refkey1;
+
     private String refdata1;
+
+    private String refkey2;
+
+    private String refdata2;
+
+    private String refdata3;
+
+    private Double refdata4;
+
+    public ReferenceRecord(String refkey1, String refdata1, String refkey2,
+                           String refdata2, String refdata3, Double refdata4)
+    {
+        this.refkey1 = refkey1;
+        this.refdata1 = refdata1;
+        this.refkey2 = refkey2;
+        this.refdata2 = refdata2;
+        this.refdata3 = refdata3;
+        this.refdata4 = refdata4;
+    }
+
+    public ReferenceRecord()
+    {
+
+    }
 
     public String getRefkey1() {
         return refkey1;
@@ -56,8 +81,15 @@ public class ReferenceRecord {
         this.refdata4 = refdata4;
     }
 
-    private String refkey2;
-    private String refdata2;
-    private String refdata3;
-    private Double refdata4;
+    @Override
+    public String toString() {
+        return "ReferenceRecord{" +
+                "refkey1='" + refkey1 + '\'' +
+                ", refdata1='" + refdata1 + '\'' +
+                ", refkey2='" + refkey2 + '\'' +
+                ", refdata2='" + refdata2 + '\'' +
+                ", refdata3='" + refdata3 + '\'' +
+                ", refdata4=" + refdata4 +
+                '}';
+    }
 }
