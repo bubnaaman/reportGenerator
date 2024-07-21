@@ -7,6 +7,7 @@ import com.example.reportgenerator.service.FileProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,46 +19,87 @@ import java.util.Objects;
 @RestController
 public class ReportController {
 
+    /**
+     * Logger
+     */
     private static final Logger logger = LoggerFactory.getLogger(SchedulerConfig.class);
+
+    /**
+     * Report generation service
+     */
     @Autowired
     private ReportGenerator reportGeneratorService;
 
+    /**
+     * File processor
+     */
     @Autowired
     private FileProcessor fileProcessor;
 
+    /**
+     * Input directory
+     */
+    @Value("${file.input.dir}")
+    private String inputPath;
+
+    /**
+     * Reference file path
+     */
+    @Value("${file.reference.path}")
+    private String referenceFilePath;
+
+    /**
+     * Output path
+     */
+    @Value("${file.output.dir}")
+    private String outputPath;
+
+    /**
+     * REST API endpoint to trigger report generation manually
+     * @return Response for API
+     */
     @PostMapping("/trigger-report-generation")
     public String triggerReportGeneration() {
         try {
             logger.info("API Trigger: Report generation process started.");
 
-            File inputDir = new File("input");
-            File referenceFile = new File("reference/reference.csv");
-            File outputDir = new File("output");
+            File lInputDirectory = new File(inputPath);
+            File lReferenceFile = new File(referenceFilePath);
+            File lOutputDirectory = new File(outputPath);
 
             // Ensure the output directory exists
-            Files.createDirectories(Paths.get(outputDir.toURI()));
+            Files.createDirectories(Paths.get(lOutputDirectory.toURI()));
 
-            var referenceRecords = fileProcessor.processReferenceFile(referenceFile);
+            var lReference = fileProcessor.
+                    processReferenceFile(lReferenceFile);
 
             // Process each input file in the input directory
-            for (File inputFile : Objects.requireNonNull(inputDir.listFiles())) {
-                if (inputFile.isFile() && inputFile.getName().endsWith(".csv")) {
-                    logger.debug("Processing input file: {}", inputFile.getName());
-                    var inputRecords = fileProcessor.processInputFile(inputFile);
-                    var outputRecords = reportGeneratorService.generateReport(inputRecords, referenceRecords);
+            for (File lInputFile : Objects.requireNonNull(lInputDirectory.
+                    listFiles()))
+            {
+                if (lInputFile.isFile() && lInputFile.getName().endsWith(".csv"))
+                {
+                    logger.debug("Processing input file: {}",
+                            lInputFile.getName());
+                    var inputRecords = fileProcessor.
+                            processInputFile(lInputFile);
+                    var outputRecords = reportGeneratorService
+                            .generateReport(inputRecords, lReference);
 
-                    String outputFileName = inputFile.getName().replace(".csv", "_output.csv");
-                    File outputFile = new File(outputDir, outputFileName);
-                    fileProcessor.writeOutputFile(outputRecords, outputFile);
-                    logger.debug("Generated report for file: {} and saved as: {}", inputFile.getName(), outputFileName);
+                    String lFileName = lInputFile.getName()
+                            .replace(".csv", "_output.csv");
+                    File lOutputFile = new File(lOutputDirectory, lFileName);
+                    fileProcessor.writeOutputFile(outputRecords, lOutputFile);
+                    logger.debug("Generated report for file: {} and saved as:" +
+                            " {}", lInputFile.getName(), lFileName);
                 }
             }
             logger.info("API Trigger: Report generation process finished.");
-            return "Report generation triggered successfully!";
+            return "Report generated successfully!";
         } catch (Exception e) {
-            logger.error("Error occurred during report generation", e);
+            logger.error("API Trigger: Error occurred during report generation"
+                    , e);
             return "Error occurred during report generation: " + e.getMessage();
         }
-
     }
 }

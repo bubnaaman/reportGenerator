@@ -12,5 +12,5 @@ import java.util.List;
  * Further new rules can be added by implementing this interface.
  */
 public interface ReportGenerator {
-    List<OutputRecord> generateReport(List<InputRecord> inputRecords, List<ReferenceRecord> referenceRecords);
+    List<OutputRecord> generateReport(List<InputRecord> aInInputRecords, List<ReferenceRecord> aInReferenceRecords);
 }

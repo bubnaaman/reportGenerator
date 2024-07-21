@@ -16,17 +16,35 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Process the CSV files
+ */
 @Service
 public class CsvFileProcessor implements FileProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(CsvFileProcessor.class);
+    /**
+     * Logger
+     */
+    private static final Logger logger =
+            LoggerFactory.getLogger(CsvFileProcessor.class);
 
+    /**
+     * Reads from CSV input file.
+     * @param aInFile Input csv file
+     * @return List of input records
+     * @throws Exception if any
+     */
     @Override
-    public List<InputRecord> processInputFile(File file) throws Exception {
-        logger.info("Processing input file: {}", file.getAbsolutePath());
-        List<InputRecord> inputRecords = new ArrayList<>();
-        try (CSVParser csvParser = new CSVParser(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
-            for (CSVRecord csvRecord : csvParser) {
+    public List<InputRecord> processInputFile(File aInFile) throws Exception
+    {
+        logger.info("Processing input file: {}", aInFile.getAbsolutePath());
+        List<InputRecord> lInputRecords = new ArrayList<>();
+        try (CSVParser lCSVParser = new CSVParser(new InputStreamReader
+                (new FileInputStream(aInFile), StandardCharsets.UTF_8),
+                CSVFormat.DEFAULT))
+        {
+            for (CSVRecord csvRecord : lCSVParser)
+            {
                 InputRecord lRecord = new InputRecord();
                 lRecord.setField1(csvRecord.get(0));
                 lRecord.setField2(csvRecord.get(1));
@@ -34,54 +52,89 @@ public class CsvFileProcessor implements FileProcessor {
                 lRecord.setField5(Double.valueOf(csvRecord.get(4)));
                 lRecord.setRefkey1(csvRecord.get(5));
                 lRecord.setRefkey2(csvRecord.get(6));
-                inputRecords.add(lRecord);
+                lInputRecords.add(lRecord);
                 logger.debug("Processed input record: {}", lRecord);
             }
-        } catch (IOException e) {
-            logger.error("Error processing input file: {}", file.getAbsolutePath(), e);
-            throw e;
-        }
-        logger.info("Finished processing input file. Number of records: {}", inputRecords.size());
-        return inputRecords;
-    }
-
-    @Override
-    public List<ReferenceRecord> processReferenceFile(File file) throws Exception {
-        logger.info("Processing reference file: {}", file.getAbsolutePath());
-        List<ReferenceRecord> referenceRecords = new ArrayList<>();
-        try (CSVParser csvParser = new CSVParser(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
-            for (CSVRecord csvRecord : csvParser) {
-                ReferenceRecord lRecord = new ReferenceRecord();
-                lRecord.setRefkey1(csvRecord.get(0));
-                lRecord.setRefdata1(csvRecord.get(1));
-                lRecord.setRefkey2(csvRecord.get(2));
-                lRecord.setRefdata2(csvRecord.get(3));
-                lRecord.setRefdata3(csvRecord.get(4));
-                lRecord.setRefdata4(Double.parseDouble(csvRecord.get(5)));
-                referenceRecords.add(lRecord);
-                logger.debug("Processed reference record: {}", lRecord);
-            }
-        } catch (IOException e) {
-            logger.error("Error processing reference file: {}", file.getAbsolutePath(), e);
-            throw e;
-        }
-        logger.info("Finished processing reference file. Number of records: {}", referenceRecords.size());
-        return referenceRecords;
-    }
-
-    @Override
-    public void writeOutputFile(List<OutputRecord> outputRecords, File file) throws Exception {
-        logger.info("Writing output file: {}", file.getAbsolutePath());
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("outfield1", "outfield2", "outfield3", "outfield4", "outfield5"))) {
-            for (OutputRecord outputRecord : outputRecords) {
-                csvPrinter.printRecord(outputRecord.getOutfield1(), outputRecord.getOutfield2(), outputRecord.getOutfield3(), outputRecord.getOutfield4(), outputRecord.getOutfield5());
-                logger.debug("Written output record: {}", outputRecord);
-            }
-        } catch (Exception aInException) {
-            logger.error("Error writing output file: {}", file.getAbsolutePath(), aInException);
+        } catch (Exception aInException)
+        {
+            logger.error("Error processing input file: {}",
+                    aInFile.getAbsolutePath(), aInException);
             throw aInException;
         }
-        logger.info("Finished writing output file. Number of records: {}", outputRecords.size());
+        logger.info("Finished processing input file. Number of records: {}",
+                lInputRecords.size());
+        return lInputRecords;
+    }
+
+    /**
+     * Reads from the CSV Reference file
+     * @param aInFile Reference file
+     * @return Reference records
+     * @throws Exception if any
+     */
+    @Override
+    public List<ReferenceRecord> processReferenceFile(File aInFile) throws Exception
+    {
+        logger.info("Processing reference file: {}", aInFile.getAbsolutePath());
+        List<ReferenceRecord> lReferenceRecords = new ArrayList<>();
+        try (CSVParser lCSVParser = new CSVParser(new InputStreamReader
+                (new FileInputStream(aInFile), StandardCharsets.UTF_8),
+                CSVFormat.DEFAULT))
+        {
+            for (CSVRecord lCSVRecord : lCSVParser)
+            {
+                ReferenceRecord lRecord = new ReferenceRecord();
+                lRecord.setRefkey1(lCSVRecord.get(0));
+                lRecord.setRefdata1(lCSVRecord.get(1));
+                lRecord.setRefkey2(lCSVRecord.get(2));
+                lRecord.setRefdata2(lCSVRecord.get(3));
+                lRecord.setRefdata3(lCSVRecord.get(4));
+                lRecord.setRefdata4(Double.parseDouble(lCSVRecord.get(5)));
+                lReferenceRecords.add(lRecord);
+                logger.debug("Processed reference record: {}", lRecord);
+            }
+        } catch (Exception aInException)
+        {
+            logger.error("Error processing reference file: {}",
+                    aInFile.getAbsolutePath(), aInException);
+            throw aInException;
+        }
+        logger.info("Finished processing reference file. Number of records: {}",
+                lReferenceRecords.size());
+        return lReferenceRecords;
+    }
+
+    /**
+     * Write to output CSV file
+     * @param aOutRecords Records to write in csv file.
+     * @param aInFile Output CSV file
+     * @throws Exception if any
+     */
+    @Override
+    public void writeOutputFile(List<OutputRecord> aOutRecords, File aInFile)
+            throws Exception
+    {
+        logger.info("Writing output file: {}", aInFile.getAbsolutePath());
+        try (BufferedWriter lWriter = new BufferedWriter(new OutputStreamWriter
+                (new FileOutputStream(aInFile), StandardCharsets.UTF_8));
+             CSVPrinter lCSVPrinter = new CSVPrinter(lWriter,
+                     CSVFormat.DEFAULT.withHeader("outfield1", "outfield2",
+                             "outfield3", "outfield4", "outfield5")))
+        {
+            for (OutputRecord lOutputRecord : aOutRecords) {
+                lCSVPrinter.printRecord(lOutputRecord.getOutfield1(),
+                        lOutputRecord.getOutfield2(),
+                        lOutputRecord.getOutfield3(),
+                        lOutputRecord.getOutfield4(),
+                        lOutputRecord.getOutfield5());
+                logger.debug("Written output record: {}", lOutputRecord);
+            }
+        } catch (Exception aInException) {
+            logger.error("Error writing output file: {}",
+                    aInFile.getAbsolutePath(), aInException);
+            throw aInException;
+        }
+        logger.info("Finished writing output file. Number of records: {}",
+                aOutRecords.size());
     }
 }

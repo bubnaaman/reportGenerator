@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class ReportGeneratorService implements ReportGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReportGeneratorService.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(ReportGeneratorService.class);
 
     /**
      * Generates the report based on the transformation rules.
@@ -30,70 +31,93 @@ public class ReportGeneratorService implements ReportGenerator {
      * outfield4 = field3 * max(field5,refdata4)
      * outfield5 = max(field5,refdata4)
      *
-     * @param inputRecords     Input records
-     * @param referenceRecords Reference records
+     * @param aInInputRecords     Input records
+     * @param aInReferenceRecords Reference records
      * @return List of output records to write in CSV
      */
     @Override
-    public List<OutputRecord> generateReport(List<InputRecord> inputRecords, List<ReferenceRecord> referenceRecords) {
-        logger.info("Starting report generation with {} input records and {} reference records", inputRecords.size(), referenceRecords.size());
+    public List<OutputRecord> generateReport
+    (List<InputRecord> aInInputRecords, List<ReferenceRecord> aInReferenceRecords)
+    {
+        logger.info("Starting report generation with {} input records and {}" +
+                " reference records", aInInputRecords.size(),
+                aInReferenceRecords.size());
 
-        // Create a map for quick lookup of reference records
-        Map<String, ReferenceRecord> referenceMap = createReferenceMap(referenceRecords);
+        Map<String, ReferenceRecord> lReferenceMap
+                = createReferenceMap(aInReferenceRecords);
 
-        List<OutputRecord> outputRecords = inputRecords.stream().map(inputRecord -> transformToOutputRecord(inputRecord, referenceMap)).filter(Objects::nonNull).collect(Collectors.toList());
+        List<OutputRecord> aOutRecords = aInInputRecords.stream()
+                .map(inputRecord -> transformToOutputRecord(inputRecord,
+                        lReferenceMap)).filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-        logger.info("Report generation completed with {} output records", outputRecords.size());
-        return outputRecords;
+        logger.info("Report generation completed with {} output records",
+                aOutRecords.size());
+        return aOutRecords;
     }
 
     /**
      * Create a map from reference records for quick lookups.
      *
-     * @param referenceRecords List of reference records
+     * @param aInReferenceRecords List of reference records
      * @return Map with combined key of refkey1 and refkey2
      */
-    private Map<String, ReferenceRecord> createReferenceMap(List<ReferenceRecord> referenceRecords) {
-        return referenceRecords.stream().collect(Collectors.toMap(ref -> ref.getRefkey1() + "|" + ref.getRefkey2(), Function.identity()));
+    private Map<String, ReferenceRecord> createReferenceMap
+    (List<ReferenceRecord> aInReferenceRecords)
+    {
+        return aInReferenceRecords.stream().collect(Collectors.toMap
+                (ref -> ref.getRefkey1() + "|" + ref.getRefkey2(),
+                        Function.identity()));
     }
 
     /**
      * Transform an input record to an output record based on reference data.
      *
-     * @param inputRecord  The input record
-     * @param referenceMap Map of reference records
+     * @param aInInputRecord  The input record
+     * @param aInReferenceMap Map of reference records
      * @return The transformed output record
      */
-    private OutputRecord transformToOutputRecord(InputRecord inputRecord, Map<String, ReferenceRecord> referenceMap) {
-        logger.debug("Processing input record: {}", inputRecord);
+    private OutputRecord transformToOutputRecord
+    (InputRecord aInInputRecord, Map<String, ReferenceRecord> aInReferenceMap)
+    {
+        logger.debug("Processing input record: {}", aInInputRecord);
 
-        String key = inputRecord.getRefkey1() + "|" + inputRecord.getRefkey2();
-        ReferenceRecord refRecord = referenceMap.get(key);
+        String lKey = aInInputRecord.getRefkey1() + "|" +
+                aInInputRecord.getRefkey2();
+        ReferenceRecord lRefRecord = aInReferenceMap.get(lKey);
 
-        if (refRecord == null) {
-            logger.warn("No matching reference record found for input record: {}", inputRecord);
+        if (lRefRecord == null) {
+            logger.warn("No matching reference record found for input record:" +
+                    " {}", aInInputRecord);
             return null;
         }
 
-        return createOutputRecord(inputRecord, refRecord);
+        return createOutputRecord(aInInputRecord, lRefRecord);
     }
 
     /**
      * Create an output record based on the input record and reference record.
      *
-     * @param inputRecord The input record
-     * @param refRecord   The reference record
+     * @param aInInputRecord The input record
+     * @param aInReferenceRecord   The reference record
      * @return The output record
      */
-    private OutputRecord createOutputRecord(InputRecord inputRecord, ReferenceRecord refRecord) {
-        OutputRecord outputRecord = new OutputRecord();
-        outputRecord.setOutfield1(inputRecord.getField1() + inputRecord.getField2());
-        outputRecord.setOutfield2(refRecord.getRefdata1());
-        outputRecord.setOutfield3(refRecord.getRefdata2() + refRecord.getRefdata3());
-        outputRecord.setOutfield4(Double.parseDouble(inputRecord.getField3()) * Math.max(inputRecord.getField5().intValue(), refRecord.getRefdata4().intValue()));
-        outputRecord.setOutfield5(Math.max(inputRecord.getField5(), refRecord.getRefdata4()));
+    private OutputRecord createOutputRecord(InputRecord aInInputRecord,
+                                            ReferenceRecord aInReferenceRecord)
+    {
+        OutputRecord lOutputRecord = new OutputRecord();
+        lOutputRecord.setOutfield1(aInInputRecord.getField1()
+                + aInInputRecord.getField2());
+        lOutputRecord.setOutfield2(aInReferenceRecord.getRefdata1());
+        lOutputRecord.setOutfield3(aInReferenceRecord.getRefdata2()
+                + aInReferenceRecord.getRefdata3());
+        lOutputRecord.setOutfield4(Double.parseDouble(aInInputRecord.getField3())
+                * Math.max(aInInputRecord.getField5().intValue(),
+                aInReferenceRecord.getRefdata4().intValue()));
+        lOutputRecord.setOutfield5(Math.max(aInInputRecord.getField5(),
+                aInReferenceRecord.getRefdata4()));
 
-        logger.debug("Generated output record: {}", outputRecord);
-        return outputRecord;
+        logger.debug("Generated output record: {}", lOutputRecord);
+        return lOutputRecord;
     }
 }
