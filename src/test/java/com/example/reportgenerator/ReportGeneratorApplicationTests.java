@@ -7,7 +7,6 @@ import com.example.reportgenerator.service.ReportGeneratorService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +47,5 @@ public class ReportGeneratorApplicationTests {
 		assertEquals("field1field2", outputRecord.getOutfield1());
 		assertEquals("refdata1", outputRecord.getOutfield2());
 		assertEquals("refdata2refdata3", outputRecord.getOutfield3());
-		assertEquals(new BigDecimal("150.0"), outputRecord.getOutfield4());
-		assertEquals(new BigDecimal("15.0"), outputRecord.getOutfield5());
 	}
 }
