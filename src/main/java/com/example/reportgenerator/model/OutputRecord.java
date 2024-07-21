@@ -42,6 +42,19 @@ public class OutputRecord {
         this.outfield4 = outfield4;
     }
 
+    public OutputRecord(String outfield1, String outfield2, String outfield3, Double outfield4, Double outfield5) {
+        this.outfield1 = outfield1;
+        this.outfield2 = outfield2;
+        this.outfield3 = outfield3;
+        this.outfield4 = outfield4;
+        this.outfield5 = outfield5;
+    }
+
+    public OutputRecord()
+    {
+
+    }
+
     public Double getOutfield5() {
         return outfield5;
     }
