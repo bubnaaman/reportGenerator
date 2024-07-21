@@ -1,6 +1,6 @@
 package com.example.reportgenerator.config;
 
-import com.example.reportgenerator.service.ReportGeneratorService;
+import com.example.reportgenerator.service.ReportGenerator;
 import com.example.reportgenerator.service.FileProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,10 +19,16 @@ import java.util.Objects;
 @EnableScheduling
 public class SchedulerConfig {
 
+    /**
+     * Logger
+     */
     private static final Logger logger = LoggerFactory.getLogger(SchedulerConfig.class);
 
+    /**
+     * Report generator service
+     */
     @Autowired
-    private ReportGeneratorService reportGeneratorService;
+    private ReportGenerator reportGeneratorService;
 
     @Autowired
     private FileProcessor fileProcessor;
@@ -30,13 +36,16 @@ public class SchedulerConfig {
     @Value("${report.schedule.fixedRate}")
     private long fixedRate;
 
+    public SchedulerConfig() {
+    }
+
     @Scheduled(fixedRateString = "${report.schedule.fixedRate}")
     public void processFiles() {
         logger.info("Scheduled task started: Report generation process started.");
         try {
-            File inputDir = new File("/input");
-            File referenceFile = new File("/reference/reference.csv");
-            File outputDir = new File("/output");
+            File inputDir = new File("input");
+            File referenceFile = new File("reference/reference.csv");
+            File outputDir = new File("output");
 
             // Ensure the output directory exists
             Files.createDirectories(Paths.get(outputDir.toURI()));
@@ -56,8 +65,10 @@ public class SchedulerConfig {
                     logger.info("Generated report for file: {} and saved as: {}", inputFile.getName(), outputFileName);
                 }
             }
-        } catch (Exception e) {
-            logger.error("Error occurred during report generation", e);
+        } catch (Exception aInException) {
+            logger.error("Error occurred during report generation", aInException);
+            logger.warn("Scheduled task completed: Report generation process finished with errors.");
+            return;
         }
         logger.info("Scheduled task completed: Report generation process finished.");
     }

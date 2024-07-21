@@ -1,6 +1,7 @@
 package com.example.reportgenerator.controller;
 
 import com.example.reportgenerator.config.SchedulerConfig;
+import com.example.reportgenerator.service.ReportGenerator;
 import com.example.reportgenerator.service.ReportGeneratorService;
 import com.example.reportgenerator.service.FileProcessor;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ public class ReportController {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerConfig.class);
     @Autowired
-    private ReportGeneratorService reportGeneratorService;
+    private ReportGenerator reportGeneratorService;
 
     @Autowired
     private FileProcessor fileProcessor;
